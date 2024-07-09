@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: beam-connexi-order
+spec:
+  selector:
+    matchLabels:
+      app: beam-connexi-order
+  template:
+    metadata:
+      labels:
+        app: beam-connexi-order
+    spec:
+      containers:
+      - name: beam-connexi-order
+        image: asia-southeast1-docker.pkg.dev/sirclo-data-prod/data-service/spark-beam:1.3.3  # Replace with your Beam app image
+        imagePullPolicy: Always
+        command: ["./gradlew", "run", "--args=--projectId=sirclo-prod --subscriptionName=cnx_order_process_log-osiris-sub --tableName=connexi_order --username=d3_Acc0unt --password=d3Acc& --jdbcUrl=jdbc:mysql://basic-tidb.tidb-cluster:4000/commerce --batchSize=100", "--stacktrace"]
+        env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /app/creds/osiris_creds.json
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1"
+          limits:
+            memory: "8Gi"
+            cpu: "4"
+        volumeMounts:  # Mount the secret volume into the container
+          - name: secrets-volume
+            mountPath: /app/creds
+      restartPolicy: Always
+      volumes:
+        - name: secrets-volume
+          secret:
+            secretName: gcs-key-osiris

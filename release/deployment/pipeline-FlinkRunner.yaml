@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flink-beam
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: flink-beam
+  template:
+    metadata:
+      labels:
+        app: flink-beam
+    spec:
+      containers:
+        - name: flink-beam
+          image: asia-southeast1-docker.pkg.dev/sirclo-data-prod/data-service/spark-beam:1.4.0
+          imagePullPolicy: Always
+          command: ["flink", "run", "-m", "10.103.249.181:8081", "/opt/flink/usrlib/pipeline-1.0-SNAPSHOT.jar",
+                    "--projectId=sirclo-prod", "--subscriptionName=cnx_order_process_log-osiris-sub",
+                    "--tableName=connexi_order", "--username=d3_Acc0unt", "--password=d3Acc&",
+                    "--jdbcUrl=jdbc:mysql://basic-tidb.tidb-cluster:4000/test", "--batchSize=100"]
+          env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /app/creds/osiris_creds.json
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "1"
+            limits:
+              memory: "8Gi"
+              cpu: "4"
+          volumeMounts:
+            - name: secrets-volume
+              mountPath: /app/creds
+      restartPolicy: Always 
+      volumes:
+        - name: secrets-volume
+          secret:
+            secretName: gcs-key-osiris

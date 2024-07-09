@@ -1,5 +1,6 @@
 package com.sirclo.beam.options;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.beam.sdk.options.Description;
 import org.apache.beam.sdk.options.PipelineOptions;
 
@@ -27,5 +28,9 @@ public interface StreamInsertOptions extends PipelineOptions {
     @Description("Target database URL")
     String getJdbcUrl();
     void setJdbcUrl(String jdbcUrl);
+
+    @Description("Batch size for SQL")
+    Integer getBatchSize();
+    void setBatchSize(Integer batchSize);
 
 }

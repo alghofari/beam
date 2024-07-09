@@ -35,12 +35,8 @@ test {
     useJUnitPlatform()
 }
 
-tasks.withType(Jar).configureEach {
+tasks.withType(Jar) {
     zip64 = true
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.release = 17
 }
 
 // Package a self-contained jar file.
